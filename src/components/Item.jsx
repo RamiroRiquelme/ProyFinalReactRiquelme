@@ -1,38 +1,34 @@
+
 import React, { useContext } from "react";
 import { CartContext } from "../contexts/ShoppingCartContext";
 
-export const Item = ({ name, price, id, imgUrl, description }) => {
+export const Item = ({ name, price, id, img, description }) => {
   const [cart, setCart] = useContext(CartContext);
 
   const addToCart = () => {
-    setCart((currItems) => {
-      const isItemsFound = currItems.find((item) => item.id === id);
-      if (isItemsFound) {
-        return currItems.map((item) => {
-          if (item.id === id) {
-            return { ...item, quantity: item.quantity + 1 };
-          } else {
-            return item;
-          }
-        });
+    setCart((prevCart) => {
+      const isItemFound = prevCart.find((item) => item.id === id);
+
+      if (isItemFound) {
+        return prevCart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        );
       } else {
-        return [...currItems, { id, quantity: 1, price }];
+        return [...prevCart, { id, quantity: 1, price }];
       }
     });
   };
 
   const removeItem = (id) => {
-    setCart((currItems) => {
-      if (currItems.find((item) => item.id === id)?.quantity === 1) {
-        return currItems.filter((item) => item.id !== id);
+    setCart((prevCart) => {
+      const item = prevCart.find((item) => item.id === id);
+
+      if (item && item.quantity === 1) {
+        return prevCart.filter((item) => item.id !== id);
       } else {
-        return currItems.map((item) => {
-          if (item.id === id) {
-            return { ...item, quantity: item.quantity - 1 };
-          } else {
-            return item;
-          }
-        });
+        return prevCart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        );
       }
     });
   };
@@ -45,10 +41,8 @@ export const Item = ({ name, price, id, imgUrl, description }) => {
 
   return (
     <div className="item">
-      
-
       <div className="name">{name}</div>
-      <img src={imgUrl} width="80%" height="auto"  />
+      <img src={img} width="80%" height="auto" alt={`Imagen de ${name}`} />
       <p>{description}</p>
       <div className="item-price">${price}</div>
       {quantityPerItem > 0 && (
